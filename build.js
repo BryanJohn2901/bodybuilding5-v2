@@ -9,7 +9,31 @@ const DIST = path.join(ROOT, 'dist');
 
 function cleanDist() {
   if (fs.existsSync(DIST)) {
-    fs.rmSync(DIST, { recursive: true });
+    // Remove arquivos individualmente em vez de deletar a pasta inteira
+    const removeDir = (dir) => {
+      if (fs.existsSync(dir)) {
+        const files = fs.readdirSync(dir);
+        files.forEach(file => {
+          const filePath = path.join(dir, file);
+          const stat = fs.statSync(filePath);
+          if (stat.isDirectory()) {
+            removeDir(filePath);
+          } else {
+            try {
+              fs.unlinkSync(filePath);
+            } catch (err) {
+              // Ignora erros de arquivo bloqueado
+            }
+          }
+        });
+        try {
+          fs.rmdirSync(dir);
+        } catch (err) {
+          // Ignora erros de diretório bloqueado
+        }
+      }
+    };
+    removeDir(DIST);
   }
   fs.mkdirSync(DIST, { recursive: true });
   fs.mkdirSync(path.join(DIST, 'img'), { recursive: true });
