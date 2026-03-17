@@ -504,15 +504,23 @@
     <div class="fixed bottom-0 left-0 right-0 z-[80] bg-brand-primary border-t border-brand-accent px-4 py-3 sm:py-4 shadow-[0_-4px_20px_rgba(220,38,38,0.4)]">
         <div class="container mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3 sm:gap-4">
             
-            <div class="flex items-center gap-3 sm:gap-4">
+            <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                 <div class="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 text-white shrink-0">
                     <i class="fas fa-dumbbell"></i>
                 </div>
-                <p class="text-white font-heading font-bold uppercase tracking-wider text-base sm:text-lg lg:text-xl flex items-center gap-2">
-                    Disponíveis apenas 
-                    <span class="text-brand-black font-black bg-white px-2 py-0.5 rounded leading-none flex items-center justify-center">500</span> 
-                    ingressos
-                </p>
+                <div class="flex flex-col gap-1.5 min-w-0 flex-1">
+                    <p class="text-white font-heading font-bold uppercase tracking-wider text-base sm:text-lg lg:text-xl">
+                        Disponível apenas 
+                        <span class="text-brand-black font-black bg-white px-2 py-0.5 rounded leading-none">500</span> 
+                        ingressos Lote 1
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <div class="h-2.5 flex-1 min-w-[80px] max-w-[220px] rounded-full bg-white/25 overflow-hidden" aria-hidden="true">
+                            <div class="progress-fill h-full rounded-full bg-white transition-[width] duration-[1500ms] ease-out" style="width: 0"></div>
+                        </div>
+                        <span class="progress-pct text-white font-heading font-black text-sm sm:text-base tabular-nums">0%</span>
+                    </div>
+                </div>
             </div>
 
             <button class="js-open-modal w-full sm:w-auto bg-[#0A0A0A] hover:bg-[#1A1A1A] text-white font-heading font-bold text-sm sm:text-base lg:text-lg uppercase tracking-widest py-3 px-8 rounded-md transition-all duration-300 shadow-lg hover:-translate-y-0.5 whitespace-nowrap">
@@ -583,6 +591,26 @@
                 offset: 50,
                 duration: 800,
             });
+
+            // Barra de progresso de ingressos (0% → 94% ao carregar)
+            (function () {
+                const fill = document.querySelector('.progress-fill');
+                const pct = document.querySelector('.progress-pct');
+                if (!fill || !pct) return;
+                const endPct = 94;
+                const duration = 1500;
+                const start = performance.now();
+                function step(now) {
+                    const elapsed = now - start;
+                    const t = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - t, 2);
+                    const value = Math.round(eased * endPct);
+                    fill.style.width = value + '%';
+                    pct.textContent = value + '%';
+                    if (t < 1) requestAnimationFrame(step);
+                }
+                requestAnimationFrame(step);
+            })();
 
             // ==========================================
             // CONFIGURAÇÕES GERAIS
